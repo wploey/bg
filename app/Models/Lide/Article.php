@@ -13,6 +13,6 @@ class Article extends Model
 
     public function tags()
     {
-        return $this->belongsToMany(Tag::class)->withTimestamps();
+        return $this->belongsToMany(Tag::class, 'lide_article_tag')->withTimestamps(); //指定中间表名
     }
 }

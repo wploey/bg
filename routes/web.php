@@ -21,6 +21,6 @@ Route::get('/home', 'HomeController@index');
 
 Route::get('email/verify/{token}',['as'=>'email.verify', 'uses' => 'EmailController@verify']);
 
-Route::group(['domain' => 'bg.com'],function(){
+// Route::group(['domain' => 'bg.com'],function(){
     include __DIR__ .'/route/lide.php';
-});
+// });

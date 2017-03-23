@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Lide;
-
 use App\Http\Requests\Lide\StoreArticleRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Auth;
 use App\Models\Lide\Article;
+use App\Models\Lide\Tag;
 class ArticleController extends Controller
 {
     public function __construct()
@@ -41,7 +41,8 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request)
     {
-
+        $tags = $this->normalizeTag($request->get('tags'));
+        // dd($tags);
         $data = [
             'title' => $request->get('title'),
             'body' => $request->get('body'),
@@ -49,7 +50,9 @@ class ArticleController extends Controller
         ];
 
         $article = Article::create($data);
-
+        
+        $article->tags()->attach($tags);    //操作第三张表
+        
         return redirect()->route('article.show',[$article->id]);
     }
 
@@ -61,7 +64,7 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        $article = Article::find($id);
+        $article = Article::where('id',$id)->with('tags')->first();
         return view('ueditor.show', compact('article'));
     }
 
@@ -97,5 +100,16 @@ class ArticleController extends Controller
     public function destroy($id)
     {
         //
+    }
+    
+    private function normalizeTag(array $tags)
+    {
+        return collect($tags)->map(function($tag){
+            if(is_numeric($tag)) {
+                return (int) $tag;
+            }
+            $newTag = Tag::create(['name' => $tag]);
+            return $newTag->id;
+        })->toArray();
     }
 }

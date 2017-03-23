@@ -5,7 +5,13 @@
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <div class="panel panel-default">
-                    <div class="panel-heading">{{$article->title}}</div>
+                    <div class="panel-heading">
+                        {{$article->title}}
+                        {{dd($article)}}
+                        @foreach($article->tags as tag)
+                            <span>{{$tag->name}}</span>
+                        @endforeach
+                    </div>
                     <div class="panel-body">
                         {!! $article->body !!}
                     </div>

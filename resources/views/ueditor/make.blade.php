@@ -11,7 +11,7 @@
                         <form action="/article" method="post">
                             {!! csrf_field() !!}
                             <div class="form-group {{ $errors->has('title') ? 'has-error' : '' }}">
-                                <label for="title">标题</label>
+                                <label for="title">标 题</label>
                                 <input type="text" value="{{old('title')}}" name="title" class="form-control"
                                        placeholder="标题"></input>
                                 @if ($errors->has('title'))
@@ -20,8 +20,12 @@
                                     </span>
                                 @endif
                             </div>
+                            <div class="form-group">
+                                <select name="tags[]" class="js-example-placeholder-multiple js-data-example-ajax form-control" multiple="multiple">
+                                </select>
+                            </div>
                             <div class="form-group {{ $errors->has('body') ? 'has-error' : '' }}">
-                                <label for="title">内容</label>
+                                <label for="body">内 容</label>
                                 <script id="container" name="body" style="height:200px" type="text/plain">
                                     {!! old('body') !!}
                                 </script>
@@ -38,6 +42,7 @@
             </div>
         </div>
     </div>
+    @section('js')
     <!-- 实例化编辑器 -->
     <script type="text/javascript">
         //        var ue = UE.getEditor('container');
@@ -55,6 +60,45 @@
         ue.ready(function () {
             ue.execCommand('serverparam', '_token', '{{ csrf_token() }}'); // 设置 CSRF token.
         });
+        $(document).ready(function(){
+            function formatTopic (tag) {
+                return "<div class='select2-result-repository clearfix'>" +
+                    "<div class='select2-result-repository__meta'>" +
+                    "<div class='select2-result-repository__title'>" +
+                    tag.name ? tag.name : "Laravel"   +
+                    "</div></div></div>";
+            }
+            
+            function formatTopicSelection (tag) {
+                return tag.name || tag.text;
+            }
+            
+            $(".js-example-placeholder-multiple").select2({
+                tags: true,
+                placeholder: '选择标签',
+                minimumInputLength: 2,
+                ajax: {
+                    url: '/api/tag',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function (data, params) {
+                        return {
+                            results: data
+                        };
+                    },
+                    cache: true
+                },
+                templateResult: formatTopic,
+                templateSelection: formatTopicSelection,
+                escapeMarkup: function (markup) { return markup; }
+            });
+        }); 
     </script>
+    @endsection
 @endsection
 
